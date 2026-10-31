@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: linear-gradient(135deg, #0b0614 0%, #1a0b2e 100%);
+  color: #e5e7eb;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Паттерн шума (Noise) */
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+/* Анимация пульсации кнопки при нажатии */
+@keyframes btn-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.btn-pulse:active {
+  animation: btn-pulse 0.2s ease-in-out;
+}
+
+/* Мерцание для указателей рулетки */
+@keyframes flicker {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 10px rgba(168, 85, 247, 1)); }
+  50% { opacity: 0.7; filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.6)); }
+}
+
+.animate-flicker {
+  animation: flicker 2s infinite;
+}
+
+/* Скрытие скроллбара */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ... (ваши предыдущие стили) ... */
+
+/* Тряска экрана */
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-2px, -3px); }
+  80% { transform: translate(2px, 3px); }
+}
+
+.animate-shake {
+  animation: screen-shake 0.2s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Вспышка маркера */
+@keyframes marker-flash {
+  0% { opacity: 1; box-shadow: 0 0 10px rgba(232,121,249,1); }
+  50% { opacity: 1; box-shadow: 0 0 60px 20px rgba(255,255,255,0.8); background-color: white; }
+  100% { opacity: 1; box-shadow: 0 0 10px rgba(232,121,249,1); }
+}
+
+.animate-flash {
+  animation: marker-flash 0.4s ease-out;
+}
