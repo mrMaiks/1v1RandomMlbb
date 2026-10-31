@@ -31,43 +31,10 @@ export function useHeroes() {
   })
 
   async function loadHeroes(forceFetch = false): Promise<void> {
-    const url = import.meta.env.VITE_HEROES_API
-    if (!url) {
-      error.value = 'VITE_HEROES_API не задан в .env'
-      return
-    }
-
-    if (!forceFetch) {
-      const cachedStr = localStorage.getItem(CACHE_KEY)
-      if (cachedStr) {
-        try {
-          const cached = JSON.parse(cachedStr)
-          if (Date.now() - cached.timestamp < CACHE_TTL) {
-            processData(cached.data)
-            return
-          }
-        } catch (e) {
-          localStorage.removeItem(CACHE_KEY)
-        }
-      }
-    }
-
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await fetch(url)
-      if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`)
-      const data = (await response.json()) as HeroesApiResponse
-
-      localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data }))
-      processData(data)
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Неизвестная ошибка сети'
-    } finally {
-      loading.value = false
-    }
+  // Если переменная задана, берем её. Если нет — ищем heroes.json в папке public.
+  const url = import.meta.env.VITE_HEROES_API || `${import.meta.env.BASE_URL}heroes.json`
   }
+  // ...
 
   function processData(data: HeroesApiResponse) {
     const uniqueMap = new Map<number, Hero>(data.heroes.map((h) => [h.id, h]))
