@@ -6,7 +6,6 @@ export function useSpin() {
       return { reel: [], winnerIndex: -1 }
     }
 
-    // Исключаем прошлого победителя, если в пуле больше 1 героя
     let availablePool = pool
     if (lastWinnerId != null && pool.length > 1) {
       availablePool = pool.filter(h => h.id !== lastWinnerId)

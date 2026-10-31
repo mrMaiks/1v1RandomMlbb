@@ -7,9 +7,7 @@ function getCtx() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
   }
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume()
-  }
+  if (audioCtx.state === 'suspended') audioCtx.resume()
   return audioCtx
 }
 
@@ -18,7 +16,6 @@ export function useAudio() {
     isMuted.value = !isMuted.value
   }
 
-  // Звук тика (короткий, высокий)
   function playTick() {
     if (isMuted.value) return
     const ctx = getCtx()
@@ -27,7 +24,6 @@ export function useAudio() {
     
     osc.type = 'square'
     osc.frequency.setValueAtTime(800 + Math.random() * 200, ctx.currentTime)
-    
     gain.gain.setValueAtTime(0.05, ctx.currentTime)
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03)
     
@@ -37,7 +33,6 @@ export function useAudio() {
     osc.stop(ctx.currentTime + 0.03)
   }
 
-  // Звук остановки ("дзынь")
   function playStop() {
     if (isMuted.value) return
     const ctx = getCtx()
@@ -47,7 +42,6 @@ export function useAudio() {
     osc.type = 'sine'
     osc.frequency.setValueAtTime(600, ctx.currentTime)
     osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.3)
-    
     gain.gain.setValueAtTime(0.3, ctx.currentTime)
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3)
     
@@ -57,11 +51,10 @@ export function useAudio() {
     osc.stop(ctx.currentTime + 0.3)
   }
 
-  // Фанфары для Legendary
   function playFanfare() {
     if (isMuted.value) return
     const ctx = getCtx()
-    const notes = [523.25, 659.25, 783.99, 1046.50] // C5, E5, G5, C6
+    const notes = [523.25, 659.25, 783.99, 1046.50]
     
     notes.forEach((freq, i) => {
       const osc = ctx.createOscillator()
@@ -69,14 +62,12 @@ export function useAudio() {
       
       osc.type = 'triangle'
       osc.frequency.value = freq
-      
       gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.1)
       gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + i * 0.1 + 0.05)
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.6)
       
       osc.connect(gain)
       gain.connect(ctx.destination)
-      
       osc.start(ctx.currentTime + i * 0.1)
       osc.stop(ctx.currentTime + i * 0.1 + 0.6)
     })
