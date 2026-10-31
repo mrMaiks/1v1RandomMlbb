@@ -3,21 +3,24 @@ defineProps<{
   spinning: boolean
   poolSize: number
   sourceMode: 'all' | 'filtered'
+  isDoubleMode: boolean
 }>()
 
 const emit = defineEmits<{
   spin: []
   'update:sourceMode': [value: 'all' | 'filtered']
+  'update:isDoubleMode': [value: boolean]
 }>()
 </script>
 
 <template>
   <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-slate-900/60 border border-slate-700/50 backdrop-blur-sm">
-    <div class="flex items-center gap-4 w-full sm:w-auto">
+    <div class="flex flex-wrap items-center gap-4 w-full sm:w-auto">
       <div class="text-sm font-medium text-slate-400">
         В пуле: <span class="text-fuchsia-400 font-bold">{{ poolSize }}</span>
       </div>
       <div class="h-6 w-px bg-slate-700 hidden sm:block"></div>
+      
       <div class="flex gap-2">
         <button
           :disabled="spinning"
@@ -41,6 +44,21 @@ const emit = defineEmits<{
         >
           По фильтрам
         </button>
+
+        <!-- Переключатель 1v1 -->
+        <button
+          :disabled="spinning"
+          :class="[
+            'px-3 py-1.5 rounded-lg text-sm font-bold transition-all duration-200 uppercase tracking-wider',
+            isDoubleMode 
+              ? 'bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white shadow-[0_0_15px_rgba(232,121,249,0.4)]' 
+              : 'bg-slate-800/50 text-slate-500 hover:text-slate-300 hover:bg-slate-800',
+            spinning ? 'opacity-50 cursor-not-allowed' : ''
+          ]"
+          @click="emit('update:isDoubleMode', !isDoubleMode)"
+        >
+          1v1
+        </button>
       </div>
     </div>
 
@@ -54,7 +72,7 @@ const emit = defineEmits<{
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
-        <span v-else>Крутить</span>
+        <span v-else>{{ isDoubleMode ? 'Крутить 1v1' : 'Крутить' }}</span>
       </span>
     </button>
   </div>

@@ -7,6 +7,7 @@ import { getRarity } from '../composables/useRarity'
 const props = defineProps<{
   open: boolean
   hero: Hero | null
+  hero2?: Hero | null // ДОБАВЛЕНО
 }>()
 
 const emit = defineEmits<{
@@ -18,9 +19,9 @@ const copied = ref(false)
 const modalRef = ref<HTMLElement | null>(null)
 const spinAgainBtnRef = ref<HTMLButtonElement | null>(null)
 
-const rarity = computed<Rarity | null>(() => {
-  return props.hero ? getRarity(props.hero) : null
-})
+const rarity = computed<Rarity | null>(() => props.hero ? getRarity(props.hero) : null)
+const rarity2 = computed<Rarity | null>(() => props.hero2 ? getRarity(props.hero2) : null)
+const is1v1 = computed(() => !!props.hero2)
 
 const rarityConfig: Record<Rarity, { label: string; border: string; badge: string; glow: string; text: string }> = {
   legendary: { label: 'Legendary', border: 'from-fuchsia-500 via-orange-400 to-yellow-400', badge: 'bg-gradient-to-r from-fuchsia-500 to-orange-400 text-white', glow: 'shadow-[0_0_50px_rgba(232,121,249,0.4)]', text: 'text-fuchsia-400' },
@@ -33,7 +34,9 @@ watch(() => props.open, async (isOpen) => {
   if (isOpen) {
     await nextTick()
     spinAgainBtnRef.value?.focus()
-    if (rarity.value === 'legendary') setTimeout(fireConfetti, 200)
+    if (rarity.value === 'legendary' || rarity2.value === 'legendary') {
+      setTimeout(fireConfetti, 200)
+    }
   }
 })
 
@@ -66,7 +69,13 @@ function handleTab(e: KeyboardEvent) {
 
 async function copyResult() {
   if (!props.hero) return
-  const text = `🎲 Выпал: ${props.hero.name} [${props.hero.role.join(', ')}]`
+  let text = ''
+  if (is1v1.value && props.hero2) {
+    text = `⚔️ 1v1: Игрок 1 — ${props.hero.name} [${props.hero.role.join(', ')}] 🆚 Игрок 2 — ${props.hero2.name} [${props.hero2.role.join(', ')}]`
+  } else {
+    text = `🎲 Выпал: ${props.hero.name} [${props.hero.role.join(', ')}]`
+  }
+
   try {
     await navigator.clipboard.writeText(text)
     copied.value = true
@@ -86,34 +95,100 @@ function handleImageError(e: Event) {
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="open && hero && rarity" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" @click.self="emit('update:open', false)">
-        <div ref="modalRef" @keydown.tab="handleTab" role="dialog" aria-modal="true" aria-labelledby="modal-title" class="relative w-full max-w-sm rounded-3xl bg-slate-900 border border-slate-700/50 p-6 flex flex-col items-center text-center overflow-hidden" :class="rarityConfig[rarity].glow">
+        
+        <!-- Контейнер модалки: расширяется при 1v1 -->
+        <div 
+          ref="modalRef" 
+          @keydown.tab="handleTab" 
+          role="dialog" 
+          aria-modal="true" 
+          aria-labelledby="modal-title" 
+          class="relative w-full rounded-3xl bg-slate-900 border border-slate-700/50 p-6 flex flex-col items-center text-center overflow-hidden transition-all duration-300"
+          :class="[is1v1 ? 'max-w-3xl' : 'max-w-sm', rarityConfig[rarity].glow]"
+        >
           
           <div aria-live="polite" class="sr-only">
-            Выпал герой: {{ hero.name }}. Редкость: {{ rarityConfig[rarity].label }}. Роли: {{ hero.role.join(', ') }}.
+            <span v-if="!is1v1">
+              Выпал герой: {{ hero.name }}. Редкость: {{ rarityConfig[rarity].label }}. Роли: {{ hero.role.join(', ') }}.
+            </span>
+            <span v-else-if="hero2 && rarity2">
+              Игрок 1: {{ hero.name }}. Игрок 2: {{ hero2.name }}.
+            </span>
           </div>
 
           <div class="absolute top-0 w-full h-1/2 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
 
-          <div class="relative mb-5 mt-2">
-            <div class="p-1.5 rounded-full bg-gradient-to-tr" :class="rarityConfig[rarity].border">
-              <div class="w-32 h-32 rounded-full overflow-hidden bg-slate-800 border-4 border-slate-900 relative">
-                <img :src="hero.image" :alt="hero.name" class="w-full h-full object-cover object-top" @error="handleImageError" />
+          <!-- ОДИНОЧНЫЙ РЕЖИМ -->
+          <div v-if="!is1v1" class="flex flex-col items-center w-full">
+            <div class="relative mb-5 mt-2">
+              <div class="p-1.5 rounded-full bg-gradient-to-tr" :class="rarityConfig[rarity].border">
+                <div class="w-32 h-32 rounded-full overflow-hidden bg-slate-800 border-4 border-slate-900 relative">
+                  <img :src="hero.image" :alt="hero.name" class="w-full h-full object-cover object-top" @error="handleImageError" />
+                </div>
+              </div>
+              <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg" :class="rarityConfig[rarity].badge">
+                {{ rarityConfig[rarity].label }}
               </div>
             </div>
-            <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg" :class="rarityConfig[rarity].badge">
-              {{ rarityConfig[rarity].label }}
+
+            <h2 id="modal-title" class="font-display text-3xl font-extrabold text-white mt-2 mb-2">{{ hero.name }}</h2>
+            
+            <div class="flex flex-wrap justify-center gap-1.5 mb-8">
+              <span v-for="role in hero.role" :key="role" class="text-xs px-2 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+                {{ role }}
+              </span>
             </div>
           </div>
 
-          <h2 id="modal-title" class="font-display text-3xl font-extrabold text-white mt-2 mb-2">{{ hero.name }}</h2>
-          
-          <div class="flex flex-wrap justify-center gap-1.5 mb-8">
-            <span v-for="role in hero.role" :key="role" class="text-xs px-2 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
-              {{ role }}
-            </span>
+          <!-- РЕЖИМ 1v1 -->
+          <div v-else-if="hero2 && rarity2" class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 w-full mt-4 mb-6">
+            <!-- Игрок 1 -->
+            <div class="flex flex-col items-center flex-1">
+              <div class="relative mb-5">
+                <div class="p-1.5 rounded-full bg-gradient-to-tr" :class="rarityConfig[rarity].border">
+                  <div class="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden bg-slate-800 border-4 border-slate-900 relative">
+                    <img :src="hero.image" :alt="hero.name" class="w-full h-full object-cover object-top" @error="handleImageError" />
+                  </div>
+                </div>
+                <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest shadow-lg whitespace-nowrap" :class="rarityConfig[rarity].badge">
+                  {{ rarityConfig[rarity].label }}
+                </div>
+              </div>
+              <h2 class="font-display text-2xl md:text-3xl font-extrabold text-white mt-2 mb-2">{{ hero.name }}</h2>
+              <div class="flex flex-wrap justify-center gap-1.5">
+                <span v-for="role in hero.role" :key="role" class="text-[10px] md:text-xs px-2 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+                  {{ role }}
+                </span>
+              </div>
+            </div>
+
+            <div class="text-4xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-fuchsia-400 to-purple-600 italic drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]">
+              VS
+            </div>
+
+            <!-- Игрок 2 -->
+            <div class="flex flex-col items-center flex-1">
+              <div class="relative mb-5">
+                <div class="p-1.5 rounded-full bg-gradient-to-tr" :class="rarityConfig[rarity2].border">
+                  <div class="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden bg-slate-800 border-4 border-slate-900 relative">
+                    <img :src="hero2.image" :alt="hero2.name" class="w-full h-full object-cover object-top" @error="handleImageError" />
+                  </div>
+                </div>
+                <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest shadow-lg whitespace-nowrap" :class="rarityConfig[rarity2].badge">
+                  {{ rarityConfig[rarity2].label }}
+                </div>
+              </div>
+              <h2 class="font-display text-2xl md:text-3xl font-extrabold text-white mt-2 mb-2">{{ hero2.name }}</h2>
+              <div class="flex flex-wrap justify-center gap-1.5">
+                <span v-for="role in hero2.role" :key="role" class="text-[10px] md:text-xs px-2 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+                  {{ role }}
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div class="w-full space-y-3 relative z-10">
+          <!-- Кнопки -->
+          <div class="w-full space-y-3 relative z-10 max-w-md mx-auto">
             <button ref="spinAgainBtnRef" @click="emit('update:open', false); emit('spin-again')" class="w-full py-3 rounded-xl font-bold bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:scale-105 active:scale-95 transition-all focus:ring-2 focus:ring-purple-400 focus:outline-none">
               Перекрутить
             </button>
