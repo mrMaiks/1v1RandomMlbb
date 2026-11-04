@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, watch, nextTick } from 'vue'
 import type { Hero } from './types'
 import { useHeroes } from './composables/useHeroes'
 import { useSpin } from './composables/useSpin'
@@ -38,6 +38,21 @@ const isDoubleMode = ref(false)
 
 const p1Winner = ref<Hero | null>(null)
 const p2Winner = ref<Hero | null>(null)
+
+const filterBarRef = ref<HTMLElement | null>(null)
+
+watch([selectedRole, searchQuery], () => {
+  nextTick(() => {
+    if (filterBarRef.value) {
+      const rect = filterBarRef.value.getBoundingClientRect()
+      if (rect.top < 0) {
+        const yOffset = -20
+        const y = rect.top + window.pageYOffset + yOffset
+        window.scrollTo({ top: y, behavior: 'smooth' })
+      }
+    }
+  })
+})
 
 const activePool = computed(() => {
   let base = heroes.value
@@ -113,140 +128,143 @@ onMounted(() => { loadHeroes() })
 </script>
 
 <template>
-  <!-- pb-32 нужен, чтобы фиксированная панель не перекрывала контент внизу -->
   <div class="relative min-h-screen pb-32 font-sans overflow-x-hidden" :class="{ 'animate-shake': isShaking }">
     
-    <div class="fixed inset-0 -z-10 overflow-hidden bg-noise">
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-purple-900/20 blur-[150px] pointer-events-none" />
-      <div class="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-blue-900/10 blur-[120px] pointer-events-none" />
+    <div class="fixed inset-0 -z-10 overflow-hidden bg-arabesque">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-gold/5 blur-[150px] pointer-events-none" />
     </div>
 
     <div class="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 z-10">
       
       <header 
-        class="mb-10 flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-500"
+        class="mb-4 flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-500"
         :class="isSpinning ? 'opacity-0 -translate-y-10 pointer-events-none' : 'opacity-100 translate-y-0'"
       >
         <div class="text-center sm:text-left">
-          <h1 class="font-display text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
-            MLBB Random <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-fuchsia-500">1v1</span>
+          <h1 class="font-display text-4xl sm:text-5xl font-black tracking-widest text-gold-gradient uppercase">
+            MLBB Royal <span class="text-gold-light">1v1</span>
           </h1>
-          <p class="text-fuchsia-400/80 text-sm mt-2 font-medium tracking-widest uppercase drop-shadow-[0_0_8px_rgba(232,121,249,0.8)]">
-            Выбери своего чемпиона
+          <p class="text-gold/60 text-sm mt-2 font-serif italic tracking-widest uppercase">
+            Выберите своего чемпиона
           </p>
         </div>
-        <button @click="toggleMute" class="p-3 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors">
+        <button @click="toggleMute" class="p-3 gold-border text-gold hover:bg-gold/10 transition-colors">
           <svg v-if="!isMuted" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
           </svg>
-          <svg v-else class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+          <svg v-else class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
           </svg>
         </button>
       </header>
 
+      <div class="flex justify-center mb-8 transition-all duration-500" :class="isSpinning ? 'opacity-0' : 'opacity-100'">
+        <svg class="w-64 h-8 text-gold/60" viewBox="0 0 200 30" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M0 15h70c10 0 15-10 30-10s20 10 30 10 20-10 30-10 20 10 30 10h10" />
+          <circle cx="100" cy="15" r="4" fill="currentColor" />
+          <path d="M85 10c5 0 10 5 15 5s10-5 15-5" stroke-width="1" />
+        </svg>
+      </div>
+
+      <!-- ИСТОРИЯ ДРОПОВ С ЛОЗАМИ -->
+      <div class="transition-all duration-500" :class="isSpinning ? 'opacity-0 -translate-y-10 pointer-events-none' : 'opacity-100 translate-y-0'">
+        <section v-if="history.length > 0" class="mb-8 bg-[#0a0202] border border-gold/30 p-6 rounded-sm shadow-[0_0_20px_rgba(0,0,0,1)] relative overflow-hidden">
+          <!-- Узорчатый фон -->
+          <div class="absolute inset-0 bg-arabesque opacity-10 pointer-events-none rounded-sm"></div>
+          
+          <!-- Уголки-лозы -->
+          <div class="vine-corner vine-tl opacity-40 scale-75"></div>
+          <div class="vine-corner vine-tr opacity-40 scale-75"></div>
+          <div class="vine-corner vine-bl opacity-40 scale-75"></div>
+          <div class="vine-corner vine-br opacity-40 scale-75"></div>
+
+          <!-- Заголовок с разделителем -->
+          <div class="relative z-10 mb-4">
+            <h3 class="text-sm font-display font-bold text-gold uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+              <svg class="w-4 h-4 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+              Последние выпавшие герои
+              <svg class="w-4 h-4 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+            </h3>
+            <div class="baroque-divider"></div>
+          </div>
+          
+          <div class="flex gap-5 overflow-x-auto p-2 scrollbar-hide relative z-10">
+            <div 
+              v-for="(hero, idx) in history" 
+              :key="`${hero.id}-${idx}`" 
+              class="flex-shrink-0 w-20 h-20 rounded-full border-2 overflow-hidden bg-black relative group shadow-[0_0_15px_rgba(0,0,0,0.8)] transition-all hover:scale-110 hover:z-20" 
+              :class="{
+                'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.6)]': getRarity(hero) === 'legendary',
+                'border-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.5)]': getRarity(hero) === 'epic',
+                'border-purple-500': getRarity(hero) === 'rare',
+                'border-blue-500': getRarity(hero) === 'common'
+              }" 
+              :title="hero.name"
+            >
+              <img :src="hero.image" class="w-full h-full object-cover object-top" @error="(e: any) => e.target.src = '/placeholder.png'" />
+              <div class="absolute inset-0 bg-black/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <span class="text-[10px] font-display font-bold text-gold-light uppercase text-center leading-tight px-1">{{ hero.name }}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- СЕКЦИЯ РУЛЕТКИ -->
       <section 
         class="transition-opacity duration-500"
         :class="[
           isSpinning 
-            ? 'fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8' 
+            ? 'fixed inset-0 z-50 bg-velvet-dark/95 backdrop-blur-md flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8' 
             : 'relative mb-10 z-10'
         ]"
       >
         <div class="w-full max-w-[1400px] mx-auto">
           
-          <!-- ПЛЕЙСХОЛДЕР (сундук) -->
           <Transition name="fade">
-            <div v-if="!isSpinning" class="relative w-full flex flex-col items-center justify-center py-16 pointer-events-none">
-              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-purple-600/20 blur-[80px] animate-pulse"></div>
-              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150px] h-[150px] rounded-full bg-fuchsia-500/20 blur-[40px]"></div>
-
-              <div class="relative z-10 flex flex-col items-center animate-[bounce_3s_infinite]">
-                <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-3xl bg-slate-900/60 border border-purple-500/40 flex items-center justify-center shadow-[0_0_50px_rgba(168,85,247,0.3)] backdrop-blur-sm mb-6 transform rotate-3">
-                  <div class="absolute inset-0 rounded-3xl bg-gradient-to-tr from-purple-500/10 to-transparent"></div>
-                  <svg class="w-16 h-16 sm:w-20 sm:h-20 text-purple-400 drop-shadow-[0_0_15px_rgba(168,85,247,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            <div v-if="!isSpinning" class="relative w-full flex flex-col items-center justify-center py-12 pointer-events-none">
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-gold/10 blur-[100px] animate-pulse"></div>
+              <div class="relative z-10 flex flex-col items-center animate-[bounce_4s_infinite]">
+                <div class="relative w-48 h-48 flex items-center justify-center mb-4">
+                  <svg class="absolute inset-0 w-full h-full text-gold-dark opacity-80" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 80 L80 20" /><path d="M80 20 L85 15 L90 20 L85 25 Z" fill="currentColor" /><path d="M20 80 L15 85 M25 85 L15 75" />
+                    <path d="M80 80 L20 20" /><path d="M20 20 L15 15 L10 20 L15 25 Z" fill="currentColor" /><path d="M80 80 L85 85 M75 85 L85 75" />
                   </svg>
+                  <div class="relative w-24 h-32 bg-velvet border-2 border-gold/60 rounded-b-[50%] rounded-t-lg shadow-[0_0_30px_rgba(212,175,55,0.2)] flex items-center justify-center overflow-hidden">
+                    <div class="absolute inset-0 border border-gold/30 rounded-b-[50%] rounded-t-lg m-1"></div>
+                    <svg class="w-16 h-16 text-gold-light/40" viewBox="0 0 100 100" fill="currentColor">
+                      <path d="M50 10 C 60 30, 90 40, 80 60 C 70 80, 50 90, 50 90 C 50 90, 30 80, 20 60 C 10 40, 40 30, 50 10 Z" />
+                      <path d="M50 20 C 55 35, 70 45, 60 60 C 55 70, 50 80, 50 80 C 50 80, 45 70, 40 60 C 30 45, 45 35, 50 20 Z" fill="#1a0505" />
+                    </svg>
+                  </div>
                 </div>
-                <h3 class="text-2xl sm:text-3xl font-display font-black text-white tracking-wide mb-2">Random Hero</h3>
-                <p class="text-sm text-slate-400">Нажмите «Крутить», чтобы открыть</p>
+                <h3 class="text-4xl sm:text-5xl font-display font-black text-gold-gradient tracking-[0.15em] uppercase mb-3">Random</h3>
+                <p class="text-xl text-gold/80 italic font-serif">Нажмите «крутить»</p>
               </div>
             </div>
           </Transition>
 
-          <!-- Колеса -->
-          <SpinReel 
-            v-if="isSpinning"
-            :reel="currentReel" 
-            :winnerIndex="currentWinnerIndex" 
-            :spinning="isSpinning" 
-            @finished="handleFinished1"
-            @shake="handleShake"
-          />
+          <SpinReel v-if="isSpinning" :reel="currentReel" :winnerIndex="currentWinnerIndex" :spinning="isSpinning" @finished="handleFinished1" @shake="handleShake" />
           
-          <Transition
-            enter-active-class="transition-all duration-500 ease-out"
-            enter-from-class="opacity-0 translate-y-4 scale-95"
-            leave-active-class="transition-all duration-300 ease-in"
-            leave-to-class="opacity-0 translate-y-4 scale-95"
-          >
-            <SpinReel 
-              v-if="isDoubleMode && isSpinning"
-              :reel="currentReel2" 
-              :winnerIndex="currentWinnerIndex2" 
-              :spinning="isSpinning" 
-              @finished="handleFinished2"
-              @shake="handleShake"
-              class="mt-4"
-            />
+          <Transition enter-active-class="transition-all duration-500 ease-out" enter-from-class="opacity-0 translate-y-4 scale-95" leave-active-class="transition-all duration-300 ease-in" leave-to-class="opacity-0 translate-y-4 scale-95">
+            <SpinReel v-if="isDoubleMode && isSpinning" :reel="currentReel2" :winnerIndex="currentWinnerIndex2" :spinning="isSpinning" @finished="handleFinished2" @shake="handleShake" class="mt-6" />
           </Transition>
         </div>
       </section>
 
-      <!-- Основной контент -->
-      <div 
-        class="transition-all duration-500"
-        :class="isSpinning ? 'opacity-0 translate-y-20 pointer-events-none' : 'opacity-100 translate-y-0'"
-      >
-        <section v-if="history.length > 0" class="mb-8">
-          <h3 class="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">Последние дропы</h3>
-          <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            <div v-for="(hero, idx) in history" :key="`${hero.id}-${idx}`" class="flex-shrink-0 w-12 h-12 rounded-full border-2 overflow-hidden bg-slate-800 relative group" :class="{
-                'border-fuchsia-400 shadow-[0_0_10px_rgba(232,121,249,0.5)]': getRarity(hero) === 'legendary',
-                'border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.4)]': getRarity(hero) === 'epic',
-                'border-sky-500': getRarity(hero) === 'rare',
-                'border-slate-600': getRarity(hero) === 'common'
-              }" :title="hero.name">
-              <img :src="hero.image" class="w-full h-full object-cover object-top" @error="(e: any) => e.target.src = '/placeholder.png'" />
-            </div>
-          </div>
-        </section>
-
-        <FilterBar v-model:search="searchQuery" v-model:selected-role="selectedRole" :roles="allRoles" :total="total" :shown="filteredHeroes.length" />
+      <div class="transition-all duration-500" :class="isSpinning ? 'opacity-0 translate-y-20 pointer-events-none' : 'opacity-100 translate-y-0'">
+        <div ref="filterBarRef">
+          <FilterBar v-model:search="searchQuery" v-model:selected-role="selectedRole" :roles="allRoles" :total="total" :shown="filteredHeroes.length" />
+        </div>
 
         <HeroGrid :heroes="filteredHeroes" :loading="loading" :error="error" :bannedIds="bannedIds" @toggle-ban="toggleBan" @retry="loadHeroes(true)" />
       </div>
 
     </div>
 
-    <!-- Панель управления (выезжает снизу, скрыта при прокрутке) -->
-    <Transition
-      enter-active-class="transition-transform duration-300 ease-out"
-      enter-from-class="translate-y-full"
-      leave-active-class="transition-transform duration-300 ease-in"
-      leave-to-class="translate-y-full"
-    >
-      <SpinControls 
-        v-if="!isSpinning"
-        :spinning="isSpinning" 
-        :poolSize="activePool.length" 
-        :sourceMode="sourceMode" 
-        :isDoubleMode="isDoubleMode"
-        @update:sourceMode="sourceMode = $event" 
-        @update:isDoubleMode="isDoubleMode = $event"
-        @spin="handleSpin" 
-      />
+    <Transition enter-active-class="transition-transform duration-300 ease-out" enter-from-class="translate-y-full" leave-active-class="transition-transform duration-300 ease-in" leave-to-class="translate-y-full">
+      <SpinControls v-if="!isSpinning" :spinning="isSpinning" :poolSize="activePool.length" :sourceMode="sourceMode" :isDoubleMode="isDoubleMode" @update:sourceMode="sourceMode = $event" @update:isDoubleMode="isDoubleMode = $event" @spin="handleSpin" />
     </Transition>
 
     <ResultModal v-model:open="modalOpen" :hero="modalHero" :hero2="modalHero2" @spin-again="handleSpinAgain" />

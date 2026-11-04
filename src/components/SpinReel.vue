@@ -29,7 +29,6 @@ const transitionStyle = ref('none')
 const isAnimating = ref(false)
 const currentJitter = ref(0)
 const isFlashing = ref(false)
-
 const showReel = ref(false)
 
 let hideReelTimeout: number | undefined
@@ -59,15 +58,12 @@ function calculateTargetOffset(useJitter = true): number {
 function startTicks() {
   const startTime = performance.now()
   const duration = 5500
-
   function tick() {
     const elapsed = performance.now() - startTime
     if (elapsed >= duration) return
-
     playTick()
     const progress = elapsed / duration
     const nextDelay = 30 + Math.pow(progress, 3) * 500
-
     tickTimeout = window.setTimeout(tick, nextDelay)
   }
   tick()
@@ -80,10 +76,8 @@ function stopTicks() {
   }
 }
 
-// Вынесли логику запуска в отдельную функцию
 async function startSpin() {
   if (hideReelTimeout) clearTimeout(hideReelTimeout)
-  
   transitionStyle.value = 'none'
   translateX.value = 0
   isAnimating.value = true
@@ -102,15 +96,11 @@ async function startSpin() {
 }
 
 watch(() => props.spinning, (isSpinning) => {
-  if (isSpinning) {
-    startSpin()
-  }
+  if (isSpinning) startSpin()
 })
 
 function onTransitionEnd(e: TransitionEvent) {
-  // Проверка, что событие пришло именно от ленты, а не от других элементов
   if (e.target !== trackRef.value) return
-  
   if (e.propertyName === 'transform' && isAnimating.value) {
     isAnimating.value = false
     transitionStyle.value = 'none'
@@ -118,7 +108,6 @@ function onTransitionEnd(e: TransitionEvent) {
 
     stopTicks()
     playStop()
-
     isFlashing.value = true
     setTimeout(() => { isFlashing.value = false }, 400)
     emit('shake')
@@ -126,9 +115,7 @@ function onTransitionEnd(e: TransitionEvent) {
     const winner = props.reel[props.winnerIndex]
     if (winner) emit('finished', winner)
 
-    hideReelTimeout = window.setTimeout(() => {
-      showReel.value = false
-    }, 1200)
+    hideReelTimeout = window.setTimeout(() => { showReel.value = false }, 1200)
   }
 }
 
@@ -141,11 +128,7 @@ onMounted(() => {
     })
     resizeObserver.observe(containerRef.value)
   }
-  
-  // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Если компонент смонтировался уже во время прокрутки
-  if (props.spinning) {
-    startSpin()
-  }
+  if (props.spinning) startSpin()
 })
 
 onBeforeUnmount(() => {
@@ -155,10 +138,10 @@ onBeforeUnmount(() => {
 })
 
 const rarityStyles: Record<Rarity, any> = {
-  legendary: { ring: 'ring-2 ring-fuchsia-400', badge: 'text-fuchsia-300 border-fuchsia-500/30' },
-  epic: { ring: 'ring-2 ring-purple-500', badge: 'text-purple-300 border-purple-500/30' },
-  rare: { ring: 'ring-2 ring-sky-500', badge: 'text-sky-300 border-sky-500/30' },
-  common: { ring: 'ring-1 ring-slate-600', badge: 'text-slate-300 border-slate-600/50' },
+  legendary: { ring: 'border-2 border-red-600' },
+  epic: { ring: 'border-2 border-pink-600' },
+  rare: { ring: 'border border-purple-600' },
+  common: { ring: 'border border-blue-600' },
 }
 
 function handleImageError(e: Event) {
@@ -168,20 +151,18 @@ function handleImageError(e: Event) {
 </script>
 
 <template>
-  <div ref="containerRef" class="relative w-full h-[220px] sm:h-[260px] bg-slate-900/60 rounded-3xl border border-purple-500/40 overflow-hidden flex items-center shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] backdrop-blur-md transition-shadow duration-500" :class="spinning ? 'shadow-[0_0_50px_rgba(168,85,247,0.3)]' : ''">
+  <div ref="containerRef" class="relative w-full h-[220px] sm:h-[260px] bg-velvet-dark/80 rounded-sm border-2 border-gold/30 overflow-hidden flex items-center shadow-[inset_0_0_50px_rgba(0,0,0,1)] transition-shadow duration-500" :class="spinning ? 'shadow-[0_0_60px_rgba(212,175,55,0.2)]' : ''">
     
     <Transition name="fade">
-      <div v-if="!showReel" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gradient-to-br from-slate-900/80 via-slate-800/80 to-slate-900/80 overflow-hidden">
-        <div class="absolute w-64 h-64 rounded-full bg-purple-500/20 blur-[60px] animate-pulse"></div>
-        
+      <div v-if="!showReel" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-velvet overflow-hidden">
+        <div class="absolute w-64 h-64 rounded-full bg-gold/10 blur-[60px] animate-pulse"></div>
         <div class="relative z-10 flex flex-col items-center">
-          <div class="w-24 h-24 rounded-full bg-slate-800/90 border border-purple-500/40 flex items-center justify-center shadow-[0_0_30px_rgba(168,85,247,0.3)] mb-3 transform transition-transform hover:scale-105">
-            <svg class="w-12 h-12 text-purple-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          <div class="w-24 h-24 rounded-full gold-border flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.2)] mb-3 bg-velvet">
+            <svg class="w-12 h-12 text-gold drop-shadow-[0_0_10px_rgba(212,175,55,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 2L15 8L21 9L16 14L17 20L12 17L7 20L8 14L3 9L9 8L12 2Z" />
             </svg>
           </div>
-          <h3 class="text-xl font-display font-bold text-white mb-1">Сундук 1v1</h3>
-          <p class="text-xs text-slate-400">Содержит героев MLBB</p>
+          <h3 class="text-xl font-display font-bold text-gold-gradient mb-1 tracking-widest uppercase">Рулетка</h3>
         </div>
       </div>
     </Transition>
@@ -198,41 +179,56 @@ function handleImageError(e: Event) {
         <div
           v-for="(hero, index) in reel"
           :key="`${hero.id}-${index}`"
-          class="relative flex-shrink-0 flex flex-col rounded-xl overflow-hidden bg-slate-800"
+          class="relative flex-shrink-0 flex flex-col rounded-sm overflow-hidden bg-velvet-light card-double-border"
           :style="{ width: `${CARD_WIDTH}px` }"
           :class="[rarityStyles[getRarity(hero)].ring]"
         >
+          <!-- Уголки лозы на карточках рулетки (всегда видны, но полупрозрачные) -->
+          <div class="vine-corner vine-tl opacity-40 scale-50"></div>
+          <div class="vine-corner vine-tr opacity-40 scale-50"></div>
+          <div class="vine-corner vine-bl opacity-40 scale-50"></div>
+          <div class="vine-corner vine-br opacity-40 scale-50"></div>
+
           <div class="relative w-full" style="aspect-ratio: 3/4;">
             <img :src="hero.image" :alt="hero.name" class="w-full h-full object-cover object-top" @error="handleImageError" />
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
+            <div class="absolute inset-0 bg-gradient-to-t from-velvet-dark via-transparent to-transparent opacity-90" />
           </div>
-          <div class="absolute bottom-0 left-0 right-0 p-1.5 text-center bg-gradient-to-t from-slate-950 via-slate-900/90 to-transparent pt-4">
-            <h3 class="font-display font-bold text-white text-[10px] truncate">{{ hero.name }}</h3>
+          
+          <div class="absolute bottom-0 left-0 right-0 p-1.5 text-center bg-gradient-to-t from-black via-black/90 to-transparent pt-6">
+            <h3 class="font-display font-black text-gold-light text-[10px] truncate uppercase tracking-wider [text-shadow:_0_1px_2px_rgba(0,0,0,1)]">
+              {{ hero.name }}
+            </h3>
           </div>
         </div>
       </div>
     </Transition>
 
     <template v-if="showReel">
-      <div class="absolute inset-y-0 left-0 w-16 sm:w-24 md:w-32 bg-gradient-to-r from-slate-950 to-transparent z-20 pointer-events-none" />
-      <div class="absolute inset-y-0 right-0 w-16 sm:w-24 md:w-32 bg-gradient-to-l from-slate-950 to-transparent z-20 pointer-events-none" />
+      <div class="absolute inset-y-0 left-0 w-16 sm:w-24 md:w-32 bg-gradient-to-r from-velvet-dark to-transparent z-20 pointer-events-none" />
+      <div class="absolute inset-y-0 right-0 w-16 sm:w-24 md:w-32 bg-gradient-to-l from-velvet-dark to-transparent z-20 pointer-events-none" />
       
-      <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] bg-gradient-to-b from-purple-500/0 via-fuchsia-400/80 to-purple-500/0 z-20 pointer-events-none transition-all duration-300" :class="isFlashing ? 'animate-flash' : 'animate-flicker'" />
+      <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] bg-gradient-to-b from-gold/0 via-gold to-gold/0 z-20 pointer-events-none transition-all duration-300" :class="isFlashing ? 'animate-flash' : 'animate-flicker'" />
       
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 z-30 animate-flicker">
-        <div class="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[14px] border-l-transparent border-r-transparent border-t-fuchsia-400" />
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 z-30 animate-flicker drop-shadow-[0_0_10px_rgba(212,175,55,0.8)]">
+        <svg width="24" height="20" viewBox="0 0 24 20" fill="none">
+          <path d="M12 20L0 0H24L12 20Z" fill="#F3E5AB" />
+          <path d="M12 16L4 2H20L12 16Z" fill="#D4AF37" />
+          <circle cx="12" cy="6" r="2" fill="#1a0505" />
+        </svg>
       </div>
-      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 animate-flicker">
-        <div class="w-0 h-0 border-l-[10px] border-r-[10px] border-b-[14px] border-l-transparent border-r-transparent border-b-fuchsia-400" />
+      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 animate-flicker drop-shadow-[0_0_10px_rgba(212,175,55,0.8)]">
+        <svg width="24" height="20" viewBox="0 0 24 20" fill="none" class="rotate-180">
+          <path d="M12 20L0 0H24L12 20Z" fill="#F3E5AB" />
+          <path d="M12 16L4 2H20L12 16Z" fill="#D4AF37" />
+          <circle cx="12" cy="6" r="2" fill="#1a0505" />
+        </svg>
       </div>
     </template>
   </div>
 </template>
 
 <style scoped>
-.is-spinning {
-  filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.9));
-}
+.is-spinning { filter: drop-shadow(0 0 25px rgba(212, 175, 55, 0.6)); }
 .fade-enter-active, .fade-leave-active { transition: opacity 0.4s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>

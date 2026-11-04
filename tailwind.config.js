@@ -4,17 +4,20 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Rubik', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Cormorant Garamond', 'serif'],
+        display: ['Cinzel', 'serif'],
       },
       colors: {
-        neon: {
-          purple: '#a855f7',
-          blue: '#3b82f6',
-          pink: '#ec4899',
-          cyan: '#06b6d4',
+        gold: {
+          light: '#F3E5AB',
+          DEFAULT: '#D4AF37',
+          dark: '#996515',
         },
-        base: '#0a0618',
+        velvet: {
+          DEFAULT: '#1a0505',
+          light: '#3d0c11',
+          dark: '#0d0203',
+        },
       },
     },
   },
