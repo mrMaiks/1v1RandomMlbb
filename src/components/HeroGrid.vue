@@ -37,6 +37,9 @@ const items = computed(() =>
   }),
 )
 
+// Уникальный ключ, который заставит Vue применить анимацию при смене фильтра
+const gridKey = computed(() => items.value.map(i => i.hero.id).join('-'))
+
 function handleImageError(e: Event) {
   const target = e.target as HTMLImageElement
   target.src = '/placeholder.png'
@@ -45,12 +48,14 @@ function handleImageError(e: Event) {
 
 <template>
   <section class="relative">
+    <!-- Состояние загрузки -->
     <Transition name="fade">
       <div v-if="loading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4">
         <div v-for="i in 16" :key="i" class="aspect-square rounded-2xl bg-gradient-to-b from-slate-800/60 to-slate-900/60 animate-pulse" />
       </div>
     </Transition>
 
+    <!-- Ошибка -->
     <Transition name="fade">
       <div v-if="error" class="rounded-2xl border border-red-500/40 bg-red-500/10 p-8 flex flex-col items-center justify-center text-center gap-4">
         <div>
@@ -63,14 +68,20 @@ function handleImageError(e: Event) {
       </div>
     </Transition>
 
+    <!-- Пустой результат -->
     <Transition name="fade">
       <div v-if="!loading && !error && !items.length" class="rounded-2xl border border-slate-700/60 bg-slate-900/40 p-10 text-center">
         <p class="text-slate-400">Герои не найдены</p>
       </div>
     </Transition>
 
-    <Transition name="fade">
-      <div v-if="!loading && !error && items.length" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4">
+    <!-- Сетка с плавной сменой -->
+    <Transition name="fade-grid" mode="out-in">
+      <div 
+        v-if="!loading && !error && items.length" 
+        :key="gridKey" 
+        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4"
+      >
         <article
           v-for="{ hero, style, isBanned } in items"
           :key="hero.id"
@@ -84,16 +95,19 @@ function handleImageError(e: Event) {
           <div :class="['relative aspect-square overflow-hidden', !isBanned && style.ring]">
             <img :src="hero.image" :alt="hero.name" loading="lazy" class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-110" @error="handleImageError" />
             
+            <!-- Оверлей с ролями -->
             <div class="absolute inset-0 bg-slate-950/80 flex flex-col justify-center items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none p-2">
               <span v-for="role in hero.role" :key="role" class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-slate-800 text-purple-300 border border-purple-500/30">
                 {{ role }}
               </span>
             </div>
 
+            <!-- Иконка бана -->
             <div v-if="isBanned" class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
               <svg class="w-10 h-10 text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
 
+            <!-- Имя и бейдж -->
             <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent pt-6 z-10 pointer-events-none">
               <h3 class="font-display font-bold text-white text-[11px] sm:text-xs truncate">{{ hero.name }}</h3>
             </div>
@@ -109,6 +123,22 @@ function handleImageError(e: Event) {
 </template>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active { transition: opacity 0.4s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-active, .fade-leave-active { 
+  transition: opacity 0.4s ease; 
+}
+.fade-enter-from, .fade-leave-to { 
+  opacity: 0; 
+}
+
+/* Специальная анимация для смены сетки (крест-накрест) */
+.fade-grid-enter-active,
+.fade-grid-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-grid-enter-from,
+.fade-grid-leave-to {
+  opacity: 0;
+  transform: scale(0.98) translateY(10px);
+}
 </style>
