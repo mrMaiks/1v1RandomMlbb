@@ -33,16 +33,21 @@ const emit = defineEmits<{
     <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       
       <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 w-full md:w-auto">
-        <div class="text-xs font-display uppercase tracking-widest text-gold/60 border border-gold/30 px-3 py-1.5 bg-velvet">
+        
+        <!-- Счетчик пула -->
+        <div class="text-xs font-display uppercase tracking-widest text-gold/60 border border-gold/30 px-3 py-1.5 bg-velvet min-w-[120px] text-center tabular-nums">
           В пуле: <span class="text-gold font-bold ml-1">{{ poolSize }}</span>
         </div>
         
-        <div class="flex bg-velvet border border-gold/30 p-1">
+        <!-- Переключатель режима пула -->
+        <div class="flex bg-velvet border border-gold/30 p-1 w-[220px] rounded-sm">
           <button
             :disabled="spinning"
             :class="[
-              'px-4 py-1.5 text-xs font-display uppercase tracking-widest transition-all duration-200',
-              sourceMode === 'all' ? 'bg-gold text-velvet font-bold' : 'text-gold/60 hover:text-gold',
+              'flex-1 text-center px-2 py-1.5 text-xs font-display font-bold uppercase tracking-widest transition-all duration-300 rounded-sm',
+              sourceMode === 'all' 
+                ? 'bg-gold text-velvet shadow-[0_0_15px_rgba(212,175,55,0.4)] cursor-default' 
+                : 'bg-transparent text-gold/40 hover:text-gold hover:bg-gold/10',
             ]"
             @click="emit('update:sourceMode', 'all')"
           >
@@ -51,8 +56,10 @@ const emit = defineEmits<{
           <button
             :disabled="spinning"
             :class="[
-              'px-4 py-1.5 text-xs font-display uppercase tracking-widest transition-all duration-200',
-              sourceMode === 'filtered' ? 'bg-gold text-velvet font-bold' : 'text-gold/60 hover:text-gold',
+              'flex-1 text-center px-2 py-1.5 text-xs font-display font-bold uppercase tracking-widest transition-all duration-300 rounded-sm',
+              sourceMode === 'filtered' 
+                ? 'bg-gold text-velvet shadow-[0_0_15px_rgba(212,175,55,0.4)] cursor-default' 
+                : 'bg-transparent text-gold/40 hover:text-gold hover:bg-gold/10',
             ]"
             @click="emit('update:sourceMode', 'filtered')"
           >
@@ -60,13 +67,14 @@ const emit = defineEmits<{
           </button>
         </div>
 
+        <!-- Кнопка 1v1 -->
         <button
           :disabled="spinning"
           :class="[
-            'px-4 py-1.5 border text-xs font-display font-bold uppercase tracking-widest transition-all duration-200',
+            'px-5 py-1.5 border text-xs font-display font-bold uppercase tracking-widest transition-all duration-300 rounded-sm',
             isDoubleMode 
-              ? 'bg-gold-light text-velvet border-gold-light shadow-[0_0_15px_rgba(212,175,55,0.4)]' 
-              : 'bg-velvet text-gold/60 border-gold/30 hover:text-gold',
+              ? 'bg-gold-light text-velvet border-gold-light shadow-[0_0_20px_rgba(212,175,55,0.5)] cursor-default' 
+              : 'bg-transparent text-gold/40 border-gold/30 hover:text-gold hover:border-gold',
           ]"
           @click="emit('update:isDoubleMode', !isDoubleMode)"
         >
@@ -74,6 +82,7 @@ const emit = defineEmits<{
         </button>
       </div>
 
+      <!-- Кнопка Крутить -->
       <button
         :disabled="spinning || poolSize === 0"
         class="btn-pulse relative group w-full md:w-auto px-14 py-4 font-display font-black text-xl tracking-[0.2em] uppercase transition-all duration-300
@@ -94,7 +103,6 @@ const emit = defineEmits<{
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
-          <!-- ИЗМЕНЕННЫЙ ТЕКСТ КНОПКИ -->
           <span v-else>{{ isDoubleMode ? 'Дуэль' : 'Крутить' }}</span>
         </span>
       </button>

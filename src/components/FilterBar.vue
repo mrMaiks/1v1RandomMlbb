@@ -34,7 +34,12 @@ const selectedRole = computed({
         </svg>
         <input v-model="search" type="text" placeholder="Поиск героя по имени…" class="w-full pl-10 pr-4 py-2.5 bg-velvet border border-gold/30 text-gold-light placeholder-gold/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition font-serif text-lg" />
       </div>
-      <div class="text-sm font-display text-gold/60 shrink-0 uppercase tracking-widest">
+      
+      <!-- 
+        Добавлены классы sm:min-w-[200px], sm:text-right и tabular-nums. 
+        Теперь блок имеет фиксированную ширину на десктопе и не прыгает.
+      -->
+      <div class="text-sm font-display text-gold/60 shrink-0 uppercase tracking-widest sm:min-w-[200px] sm:text-right tabular-nums">
         Найдено: <span class="text-gold font-bold">{{ shown }}</span> из <span class="text-gold-light">{{ total }}</span>
       </div>
     </div>
