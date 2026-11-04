@@ -130,12 +130,23 @@ onMounted(() => { loadHeroes() })
 <template>
   <div class="relative min-h-screen pb-32 font-sans overflow-x-hidden" :class="{ 'animate-shake': isShaking }">
     
-    <div class="fixed inset-0 -z-10 overflow-hidden bg-arabesque">
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-gold/5 blur-[150px] pointer-events-none" />
+    <!-- ЗАДНИЙ ФОН: Картина Барокко -->
+    <!-- Убедитесь, что картинка лежит по пути public/images/bg-baroque.jpg -->
+    <div class="fixed inset-0 -z-10 overflow-hidden bg-[url('/images/bg-baroque.jpg')] bg-cover bg-center bg-no-repeat bg-fixed">
+      
+      <!-- Темный оверлей: делает картину приглушенной, чтобы интерфейс читался -->
+      <div class="absolute inset-0 bg-[#0a0202]/85 backdrop-blur-[3px]"></div>
+      
+      <!-- Радиальное золотое свечение по центру -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-gold/10 blur-[150px] pointer-events-none" />
+      
+      <!-- Легкий узор арабески поверх для связности стиля -->
+      <div class="absolute inset-0 bg-arabesque opacity-30 mix-blend-overlay"></div>
     </div>
 
     <div class="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 z-10">
       
+      <!-- Шапка -->
       <header 
         class="mb-4 flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-500"
         :class="isSpinning ? 'opacity-0 -translate-y-10 pointer-events-none' : 'opacity-100 translate-y-0'"
@@ -159,6 +170,7 @@ onMounted(() => { loadHeroes() })
         </button>
       </header>
 
+      <!-- Разделитель -->
       <div class="flex justify-center mb-8 transition-all duration-500" :class="isSpinning ? 'opacity-0' : 'opacity-100'">
         <svg class="w-64 h-8 text-gold/60" viewBox="0 0 200 30" fill="none" stroke="currentColor" stroke-width="1.5">
           <path d="M0 15h70c10 0 15-10 30-10s20 10 30 10 20-10 30-10 20 10 30 10h10" />
@@ -167,19 +179,16 @@ onMounted(() => { loadHeroes() })
         </svg>
       </div>
 
-      <!-- ИСТОРИЯ ДРОПОВ С ЛОЗАМИ -->
+      <!-- ИСТОРИЯ ДРОПОВ -->
       <div class="transition-all duration-500" :class="isSpinning ? 'opacity-0 -translate-y-10 pointer-events-none' : 'opacity-100 translate-y-0'">
-        <section v-if="history.length > 0" class="mb-8 bg-[#0a0202] border border-gold/30 p-6 rounded-sm shadow-[0_0_20px_rgba(0,0,0,1)] relative overflow-hidden">
-          <!-- Узорчатый фон -->
+        <section v-if="history.length > 0" class="mb-8 bg-[#0a0202]/90 border border-gold/30 p-6 rounded-sm shadow-[0_0_20px_rgba(0,0,0,0.8)] relative overflow-hidden backdrop-blur-md">
           <div class="absolute inset-0 bg-arabesque opacity-10 pointer-events-none rounded-sm"></div>
           
-          <!-- Уголки-лозы -->
           <div class="vine-corner vine-tl opacity-40 scale-75"></div>
           <div class="vine-corner vine-tr opacity-40 scale-75"></div>
           <div class="vine-corner vine-bl opacity-40 scale-75"></div>
           <div class="vine-corner vine-br opacity-40 scale-75"></div>
 
-          <!-- Заголовок с разделителем -->
           <div class="relative z-10 mb-4">
             <h3 class="text-sm font-display font-bold text-gold uppercase tracking-[0.2em] flex items-center justify-center gap-2">
               <svg class="w-4 h-4 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
@@ -253,6 +262,7 @@ onMounted(() => { loadHeroes() })
         </div>
       </section>
 
+      <!-- ФИЛЬТРЫ И СЕТКА -->
       <div class="transition-all duration-500" :class="isSpinning ? 'opacity-0 translate-y-20 pointer-events-none' : 'opacity-100 translate-y-0'">
         <div ref="filterBarRef">
           <FilterBar v-model:search="searchQuery" v-model:selected-role="selectedRole" :roles="allRoles" :total="total" :shown="filteredHeroes.length" />
