@@ -63,7 +63,7 @@ const emit = defineEmits<{
             ]"
             @click="emit('update:sourceMode', 'filtered')"
           >
-            По фильтрам
+            По ролям
           </button>
         </div>
 
