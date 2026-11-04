@@ -127,7 +127,7 @@
     { "id": 123, "name": "Irithel", "role": ["Marksman"], "image": "https://raw.githubusercontent.com/Ceplin03/database-mlbb.Mobile-Legends-Bang-Bang/master/images-hero/irithel.png" },
     { "id": 124, "name": "Lancelot", "role": ["Assassin"], "image": "https://raw.githubusercontent.com/Ceplin03/database-mlbb.Mobile-Legends-Bang-Bang/master/images-hero/lancelot.png" },
     { "id": 125, "name": "Lesley", "role": ["Assassin", "Marksman"], "image": "https://raw.githubusercontent.com/Ceplin03/database-mlbb.Mobile-Legends-Bang-Bang/master/images-hero/lesley.png" },
-    { "id": 126, "name": "Chang'e", "role": ["Mage"], "image": "https://akmweb.youngjoygame.com/web/svnres/img/test/homepage_2_2_16_1232_1/100_b72b473b98494269cedbba84d4888409.png" },
+    { "id": 126, "name": "Chang'e", "role": ["Mage"], "image": "https://akmweb.youngjoygame.com/web/svnres/img/test/homepage_2_2_16_1232_1/100_4a2db83b0fb92b826f039955d1b8b5df.png" },
     { "id": 127, "name": "Selena", "role": ["Assassin", "Mage"], "image": "https://raw.githubusercontent.com/Ceplin03/database-mlbb.Mobile-Legends-Bang-Bang/master/images-hero/selena.png" },
     { "id": 128, "name": "Helcurt", "role": ["Assassin"], "image": "https://raw.githubusercontent.com/Ceplin03/database-mlbb.Mobile-Legends-Bang-Bang/master/images-hero/helcurt.png" },
     { "id": 129, "name": "Pharsa", "role": ["Mage"], "image": "https://raw.githubusercontent.com/Ceplin03/database-mlbb.Mobile-Legends-Bang-Bang/master/images-hero/pharsa.png" },
