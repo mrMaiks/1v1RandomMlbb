@@ -7,14 +7,12 @@ html {
 }
 
 body {
-  /* Оставляем темный цвет как запасной, пока картинка грузится */
   background-color: #0a0202;
   color: #e8dcc8;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Утилиты для золота */
 .text-gold-gradient {
   background: linear-gradient(to right, #F3E5AB, #D4AF37, #996515, #D4AF37);
   -webkit-background-clip: text;
@@ -29,14 +27,12 @@ body {
               linear-gradient(135deg, #F3E5AB, #996515, #D4AF37, #996515) border-box;
 }
 
-/* --- УЗОР АРАБЕСКИ НА ФОНЕ --- */
 .bg-arabesque {
   background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23D4AF37' stroke-opacity='0.04' stroke-width='1'%3E%3Cpath d='M60 0v120M0 60h120M30 30l60 60M30 90l60-60'/%3E%3Ccircle cx='60' cy='60' r='30'/%3E%3Ccircle cx='60' cy='60' r='15' stroke-dasharray='2 4'/%3E%3Cpath d='M60 20c10 0 20 10 20 20s-10 20-20 20-20-10-20-20 10-20 20-20zM20 60c0-10 10-20 20-20s20 10 20 20-10 20-20 20-20-10-20-20zM100 60c0-10-10-20-20-20s-20 10-20 20 10 20 20 20 20-10 20-20zM60 100c-10 0-20-10-20-20s10-20 20-20 20 10 20 20-10 20-20 20z'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 200px 200px;
   pointer-events: none;
 }
 
-/* --- УГОЛКИ ИЗ ЛИСТЬЕВ АКАНТА --- */
 .acanthus-corner {
   position: absolute;
   width: 30px;
@@ -52,7 +48,6 @@ body {
 .corner-bl { bottom: 0; left: 0; transform: scaleY(-1); }
 .corner-br { bottom: 0; right: 0; transform: scale(-1, -1); }
 
-/* --- НОВЫЕ УЗОРЫ ЛОЗЫ И БАРОККО --- */
 .vine-corner {
   position: absolute;
   width: 45px;
@@ -138,6 +133,15 @@ body {
 }
 .animate-flash {
   animation: marker-flash 0.4s ease-out;
+}
+
+/* НОВАЯ АНИМАЦИЯ ДЫХАНИЯ */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
 }
 
 .scrollbar-hide::-webkit-scrollbar { display: none; }
